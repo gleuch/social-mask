@@ -1,0 +1,9 @@
+- unless !@error || @error.blank?
+  %p.flash.error= @error
+
+%form{:action => '/', :method => 'post'}
+  %fieldset
+    %label{:for => 'tweet'}
+    %textarea#tweet{:name => 'tweet'}= params[:tweet]
+  %fieldset.buttons
+    %input{:type => 'submit', :value => configatron.button_submit}

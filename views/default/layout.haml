@@ -1,0 +1,17 @@
+!!! Strict
+%html{:xmlns => 'http://www.w3.org/1999/xhtml', :'xml:lang' => configatron.site_language, :lang => configatron.site_language}
+  %head
+    %title= (@title ? "#{@title} / " : '') + "#{configatron.site_name}"
+    %meta{:"http-equiv" => 'Content-Type', :content => 'text/html; charset=utf-8'}
+    %meta{:name => 'keywords', :content => configatron.meta_keywords.gsub(/\%t/, configatron.site_name)}
+    %meta{:name => 'description', :content => configatron.meta_description.gsub(/\%t/, configatron.site_name)}
+    %link{:rel=>'icon', :href=>'/favicon.ico'}
+    %link{:href=>'/stylesheets/screen.css', :media=>'all', :rel =>'stylesheet', :type=>'text/css'}
+    %script{:type => 'text/javascript', :src => 'http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js'}
+    %script{:type => 'text/javascript', :src => '/js/application.js'}
+
+  %body
+    #container
+      #content
+        = yield
+      #footer

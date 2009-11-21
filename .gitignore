@@ -1,0 +1,6 @@
+._*
+*.db
+settings.yml
+language.en.sample.yml
+public/papitas
+views/papitas

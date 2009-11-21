@@ -1,0 +1,20 @@
+Papitas
+
+
+=== Installation ==
+
+1. Copy settings.sample.yml and rename to settings.yml.
+2. Customize settings.yml file.
+3. Copy language.en.sample.yml and rename to language.en.yml. (or replace en for any add other language you set in settings.yml)
+4. Customize language.en.yml.
+5. Run tweet.rb.
+
+
+=== Notes ===
+
+=== Known Issues ===
+
+=== Changelog ===
+
+=== About ===
+
