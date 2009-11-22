@@ -1,0 +1,39 @@
+development: &local
+
+  # Common site messages
+  error_unknown:      'Sorry, but an unknown error has occured!'
+  error_500:          'Sorry, but an unknown error has occured.'
+  error_400:          'Sorry, but the page you were looking for could not be found.</p><p><a href="/">Click here</a> to return to the homepage.'
+  
+  tweet_invalid:      'Sorry, but your tweet must be between meaningful and be no longer than 140 characters.'
+
+  twitter_conn_fail:  'An error has occured while trying to talk to Twitter. Please try again.'
+  twitter_auth_fail:  'An error has occured while trying to authenticate with Twitter. Please try again.'
+  twitter_decline:    'We are sorry that you decided to not use %t. <a href="/">Click</a> to return.' # %t = site_name
+
+
+  button_submit:      'Send Tweet'
+
+  # Page Titles
+  title_home:         'Welcome!'
+  title_sent:         'Sent!'
+  title_send:         'Send a Tweet'
+  title_500:          'Error!'
+  title_404:          'Page Not Found!'
+  title_connect:      'Connect to Twitter'
+  title_auth:         'Authenticate with Twitter'
+
+  # SEO
+  meta_description:   '%t' # %t = site_name
+  meta_keywords:      '%t'
+
+
+production:
+  <<: *local
+
+
+staging:
+  <<: *local
+
+test:
+  <<: *local
