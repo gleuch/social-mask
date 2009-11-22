@@ -4,3 +4,4 @@ settings.yml
 language.en.sample.yml
 public/pirata
 views/pirata
+language.*.yml
