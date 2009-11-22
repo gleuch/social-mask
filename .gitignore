@@ -2,5 +2,5 @@
 *.db
 settings.yml
 language.en.sample.yml
-public/papitas
-views/papitas
+public/pirata
+views/pirata

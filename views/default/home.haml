@@ -1,9 +1,14 @@
 - unless !@error || @error.blank?
   %p.flash.error= @error
 
-%form{:action => '/', :method => 'post'}
-  %fieldset
-    %label{:for => 'tweet'}
-    %textarea#tweet{:name => 'tweet'}= params[:tweet]
-  %fieldset.buttons
-    %input{:type => 'submit', :value => configatron.button_submit}
+- if configatron.require_oauth_login && @user.blank?
+  %a.button{:href => '/connect'} Log in via Twitter
+- else
+  %form{:action => '/', :method => 'post'}
+    %input{:type => 'hidden', :name => 'auth_token', :value => ''}
+
+    %fieldset
+      %label{:for => 'tweet'}
+      %textarea#tweet{:name => 'tweet'}= params[:tweet]
+    %fieldset.buttons
+      %input{:type => 'submit', :value => configatron.button_submit}

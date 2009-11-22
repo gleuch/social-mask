@@ -12,6 +12,12 @@
 
   %body
     #container
+      - if flash[:error] || flash[:notice]
+        #flash_msgs
+          - if flash[:error]
+            %p.flash.flash_error= flash[:error]
+          - if flash[:notice]
+            %p.flash.flash_notice= flash[:notice]
       #content
         = yield
       #footer

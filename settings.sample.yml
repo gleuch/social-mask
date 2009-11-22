@@ -1,36 +1,46 @@
 development: &local
 
-  site_name:        'MissPapitas'
+  site_name:        'MissPirata'
   site_language:    'en' # 'es'
 
   template_name:    default
 
-  # twitter_oauth_token:    ENTER-YOUR-TOKEN-HERE
-  # twitter_oauth_secret:   ENTER-YOUR-TOKEN-SECRET-HERE
 
-  twitter_account_name:   misspapitas
+  # Options
+  reqiure_oath_login:     false   # Require users to have a twitter account to sign up.
+  tweet_per_session:      false   # Should user only be able to tweet once per session, or multiple times (could be a spam problem)
+  auth_token_hash:        ABCDE123
+
+
+  # If require_oauth_login == true, enter the OAuth app key/secret here
+  twitter_oauth_token:    ENTER-YOUR-TOKEN-HERE
+  twitter_oauth_secret:   ENTER-YOUR-TOKEN-SECRET-HERE
+
+  # Recipient Twitter account
+  twitter_account_name:   misspirata
   twitter_account_pass:   password
 
-  # db_type:        sqlite
-  #   db_connection:  sqlite3:///ROOT/papitas_dev.db
+
+  db_type:        sqlite
+  db_connection:  sqlite3:///ROOT/pirata_dev.db
 
 production:
   <<: *local
 
   # db_type:          mysql
-  # db_connection:    mysql://root:*****@localhost/papitas_prod
-  # db_type:          sqlite
-  # db_connection:    sqlite3:///ROOT/papitas_prod.db
+  # db_connection:    mysql://root:*****@localhost/pirata_prod
+  db_type:          sqlite
+  db_connection:    sqlite3:///ROOT/pirata_prod.db
 
 
 staging:
   <<: *local
 
-  # db_type:        sqlite
-  #   db_connection:  sqlite3:///ROOT/papitas_stage.db
+  db_type:        sqlite
+  db_connection:  sqlite3:///ROOT/pirata_stage.db
 
 test:
   <<: *local
 
-  # db_type:        sqlite
-  #   db_connection:  sqlite3:///ROOT/papitas_test.db
+  db_type:        sqlite
+  db_connection:  sqlite3:///ROOT/pirata_test.db
