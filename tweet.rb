@@ -26,8 +26,9 @@ configure do
     DataMapper.auto_upgrade!
   end
 
-
-  # cacheing :)
+  require 'sinatra/memcache'
+  set :cache_enable, (configatron.enable_memcache && Sinatra::Application.environment.to_s == 'production')
+  set :cache_logging, false # causes problems if using w/ partials! :/
 end
 
 
@@ -39,11 +40,15 @@ helpers do
   def get_recipient_stream
     return unless configatron.require_oauth_login && configatron.view_account_stream
 
-    @recipient ||= User.first(:screen_name => configatron.twitter_account_name) rescue nil
-    twitter_connect(@recipient)
-    if @twitter_client
-      @recipient_stream = @twitter_client.home_timeline
-      @recipient_info = @twitter_client.user(@recipient.screen_name)
+    begin
+      @recipient ||= User.first(:screen_name => configatron.twitter_account_name) rescue nil
+      twitter_connect(@recipient)
+      if @twitter_client
+        @recipient_stream = @twitter_client.home_timeline
+        @recipient_info = @twitter_client.user(@recipient.screen_name)
+      end
+    rescue
+      # nil
     end
   end
 
@@ -86,13 +91,13 @@ helpers do
     elsif object = options.delete(:object)
       partial(name, options.merge(:locals => {item_name => object, counter_name => nil}))
     else
-      # unless options[:cache].blank?
-      #   cache "_#{name}", :expiry => (options[:cache_expiry].blank? ? 300 : options[:cache_expiry]), :compress => false do
-      #     haml "_#{name}".to_sym, options.merge(:layout => false)
-      #   end
-      # else
+      unless options[:cache].blank?
+        cache "_#{name}", :expiry => (options[:cache_expiry].blank? ? 300 : options[:cache_expiry]), :compress => false do
+          haml "_#{name}".to_sym, options.merge(:layout => false)
+        end
+      else
         haml "_#{name}".to_sym, options.merge(:layout => false)
-      # end
+      end
     end
   end
 
@@ -129,17 +134,21 @@ helpers do
     response['Location'] = uri
     halt(*args)
   end
+  def possessiveify(str); str.match(/s$/i) ? "#{str}'" : "#{str}'s"; end
 
 end #helpers
 
 
 
 before do
-  get_user if configatron.require_oauth_login
-  @_flash, session[:_flash] = session[:_flash], nil if session[:_flash]
-  
-  get_recipient_stream
+  # Don't execute for image, css, or js paths.
+  unless request.env['REQUEST_PATH'].match(/^\/(css|js|image)/i)
+    get_user if configatron.require_oauth_login
+    get_recipient_stream
+    @_flash, session[:_flash] = session[:_flash], nil if session[:_flash]
+  end
 end
+
 
 
 # 404 errors

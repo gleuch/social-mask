@@ -1,9 +1,10 @@
 development: &local
 
-  site_name:        'MissPirata'
-  site_language:    'en' # 'es'
+  site_name:              'MissPirata'
+  site_language:          'en' # 'es'
 
-  template_name:    default
+  template_name:          default
+  enable_memcache:        false
 
 
   # Options
