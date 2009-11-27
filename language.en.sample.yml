@@ -1,7 +1,7 @@
 development: &local
 
   # Common site messages
-  error_unknown:      'Sorry, but an unknown error has occured!'
+  error_unknown:      'Sorry, but an unknown error has occured.'
   error_500:          'Sorry, but an unknown error has occured.'
   error_400:          'Sorry, but the page you were looking for could not be found.</p><p><a href="/">Click here</a> to return to the homepage.'
   

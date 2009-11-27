@@ -8,8 +8,11 @@ development: &local
 
   # Options
   reqiure_oath_login:     false   # Require users to have a twitter account to sign up.
-  tweet_per_session:      false   # Should user only be able to tweet once per session, or multiple times (could be a spam problem)
+  tweet_per_session:      false   # Should user only be able to tweet once per session, or multiple times (could be a spam problem).
+  send_though_sender:     true    # Sender also sends out tweet. (Requires require_oauth_login to be true.)
   auth_token_hash:        ABCDE123
+
+  view_account_stream:    true  # Fetch the account timeline stream for display purposes. (Highly recommend caching on this!) (Requires require_oauth_login to be true.)
 
 
   # If require_oauth_login == true, enter the OAuth app key/secret here
@@ -19,7 +22,6 @@ development: &local
   # Recipient Twitter account
   twitter_account_name:   misspirata
   twitter_account_pass:   password
-
 
   db_type:        sqlite
   db_connection:  sqlite3:///ROOT/pirata_dev.db

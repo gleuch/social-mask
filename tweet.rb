@@ -1,6 +1,9 @@
 require 'rubygems'
 require 'sinatra'
+
+gem 'twitter', '~> 0.7.6'
 require 'twitter' # http://github.com/jnunemaker/twitter
+
 require 'configatron'
 require 'haml'
 
@@ -22,6 +25,9 @@ configure do
     DataMapper.setup(:default, configatron.db_connection.gsub(/ROOT/, ROOT))
     DataMapper.auto_upgrade!
   end
+
+
+  # cacheing :)
 end
 
 
@@ -29,6 +35,17 @@ helpers do
   def dev?; (Sinatra::Application.environment.to_s != 'production'); end
 
   def get_user; @user = User.first(:id => session[:user]) rescue nil; end
+
+  def get_recipient_stream
+    return unless configatron.require_oauth_login && configatron.view_account_stream
+
+    @recipient ||= User.first(:screen_name => configatron.twitter_account_name) rescue nil
+    twitter_connect(@recipient)
+    if @twitter_client
+      @recipient_stream = @twitter_client.home_timeline
+      @recipient_info = @twitter_client.user(@recipient.screen_name)
+    end
+  end
 
   def has_valid_tweet_session
     if configatron.tweet_per_session
@@ -120,6 +137,8 @@ end #helpers
 before do
   get_user if configatron.require_oauth_login
   @_flash, session[:_flash] = session[:_flash], nil if session[:_flash]
+  
+  get_recipient_stream
 end
 
 
@@ -169,30 +188,35 @@ post '/' do
     # Can this be OAuth if said account was done like this?
     if configatron.require_oauth_login
       return twitter_fail(configatron.error_require_login) if @user.nil? # User login in check...
-      @recipient = User.first(:screen_name => configatron.twitter_account_name) rescue nil
+      @recipient ||= User.first(:screen_name => configatron.twitter_account_name) rescue nil
     else
       @recipient = nil
     end
 
     begin
       # Use OAuth if recipeint account has connected to app before.
-      unless @recipient.nil?
+      unless @recipient.nil? # We assume OAuth is enabled and @user is set via check done above
         twitter_connect(@recipient)
 
-        @twitter_client.update(params[:tweet])
-        @user.update_attributes(:tweeted_at => Time.now) # Update tweeted_at timestamp
+        thru_recipient = @twitter_client.update(params[:tweet])
+        @user.update(:tweeted_at => Time.now) # Update tweeted_at timestamp
+
+        if configatron.send_though_sender
+          twitter_connect(@user)
+          thru_sender = @twitter_client.update(params[:tweet]+" (again)")
+        end
 
       # Otherwise connect through HTTP Auth
       else
         httpauth = Twitter::HTTPAuth.new(configatron.twitter_account_name, configatron.twitter_account_pass)
         client = Twitter::Base.new(httpauth)
-        client.update(params[:tweet], :source => '') # Sent tweet, make source '' so it does not say API (weird hack, inorite!?)
+        thru_recipient = client.update(params[:tweet], :source => '') # Sent tweet, make source '' so it does not say API (weird hack, inorite!?)
       end
 
       session[:sent] = Time.now.to_i
       session[:tweet] = params[:tweet]
 
-      flash[:notice] = 'Tweet successfully posted.'
+      flash[:notice] = (thru_sender.blank? ? configatron.tweet_sucesss : configatron.tweet_thru_sucesss).gsub(/\%t/, user_profile_url(configatron.twitter_account_name))
       redirect '/' and return
     rescue
       twitter_fail(configatron.twitter_auth_fail)
