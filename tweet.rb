@@ -203,7 +203,7 @@ post '/' do
 
         if configatron.send_though_sender
           twitter_connect(@user)
-          thru_sender = @twitter_client.update(params[:tweet]+" (again)")
+          thru_sender = @twitter_client.update(params[:tweet])
         end
 
       # Otherwise connect through HTTP Auth
