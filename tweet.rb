@@ -195,7 +195,7 @@ end #helpers
 
 before do
   # Don't execute for image, css, or js paths.
-  unless request.env['REQUEST_PATH'].match(/^\/(css|js|image)/i)
+  unless (request.env['REQUEST_PATH'] || '').match(/^\/(css|js|image)/i)
     get_user if configatron.require_oauth_login
     @_flash, session[:_flash] = session[:_flash], nil if session[:_flash]
   end
