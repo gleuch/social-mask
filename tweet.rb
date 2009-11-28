@@ -44,6 +44,7 @@ helpers do
       twitter_connect(@recipient)
       @recipient_stream ||= @twitter_client.home_timeline if @twitter_client
     rescue
+      STDERR.puts "Problem with get_recipient_stream. (#{$!})"
       @recipient_stream = {}
     end
   end
@@ -53,20 +54,24 @@ helpers do
     begin
       @recipient ||= User.first(:screen_name => configatron.twitter_account_name) rescue nil
       twitter_connect(@recipient)
-      @recipient_info ||= @twitter_client.user(@recipient.screen_name) if @twitter_client
+      name = @recipient.screen_name rescue nil
+      name ||= configatron.twitter_account_name
+      @recipient_info ||= @twitter_client.user(name) if @twitter_client
     rescue
+      STDERR.puts "Problem with get_recipient_info. (#{$!})"
       @recipient_info = {}
     end
   end
 
-  def get_recipient_info
-    return unless configatron.require_oauth_login && configatron.view_account_stream && @recipient_followers.nil?
+  def get_recipient_friends
+    return unless configatron.require_oauth_login && configatron.view_account_stream && @recipient_friends.nil?
     begin
       @recipient ||= User.first(:screen_name => configatron.twitter_account_name) rescue nil
       twitter_connect(@recipient)
-      @recipient_followers ||= {}#@twitter_client.user(@recipient.screen_name) if @twitter_client
+      @recipient_friends ||= @twitter_client.friends if @twitter_client
     rescue
-      @recipient_followers = {}
+      STDERR.puts "Problem with get_recipient_followers. (#{$!})"
+      @recipient_friends = {}
     end
   end
 
