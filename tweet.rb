@@ -38,17 +38,35 @@ helpers do
   def get_user; @user = User.first(:id => session[:user]) rescue nil; end
 
   def get_recipient_stream
-    return unless configatron.require_oauth_login && configatron.view_account_stream
-
+    return unless configatron.require_oauth_login && configatron.view_account_stream && @recipient_stream.nil?
     begin
       @recipient ||= User.first(:screen_name => configatron.twitter_account_name) rescue nil
       twitter_connect(@recipient)
-      if @twitter_client
-        @recipient_stream = @twitter_client.home_timeline
-        @recipient_info = @twitter_client.user(@recipient.screen_name)
-      end
+      @recipient_stream ||= @twitter_client.home_timeline if @twitter_client
     rescue
-      # nil
+      @recipient_stream = {}
+    end
+  end
+
+  def get_recipient_info
+    return unless configatron.require_oauth_login && configatron.view_account_stream && @recipient_info.nil?
+    begin
+      @recipient ||= User.first(:screen_name => configatron.twitter_account_name) rescue nil
+      twitter_connect(@recipient)
+      @recipient_info ||= @twitter_client.user(@recipient.screen_name) if @twitter_client
+    rescue
+      @recipient_info = {}
+    end
+  end
+
+  def get_recipient_info
+    return unless configatron.require_oauth_login && configatron.view_account_stream && @recipient_followers.nil?
+    begin
+      @recipient ||= User.first(:screen_name => configatron.twitter_account_name) rescue nil
+      twitter_connect(@recipient)
+      @recipient_followers ||= {}#@twitter_client.user(@recipient.screen_name) if @twitter_client
+    rescue
+      @recipient_followers = {}
     end
   end
 
@@ -144,7 +162,6 @@ before do
   # Don't execute for image, css, or js paths.
   unless request.env['REQUEST_PATH'].match(/^\/(css|js|image)/i)
     get_user if configatron.require_oauth_login
-    get_recipient_stream
     @_flash, session[:_flash] = session[:_flash], nil if session[:_flash]
   end
 end

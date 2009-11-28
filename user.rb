@@ -74,3 +74,8 @@ get '/auth' do
 
   end
 end
+
+get '/logout' do
+  session[:user] = session[:account] = nil
+  redirect '/'
+end
