@@ -43,6 +43,9 @@ helpers do
       @recipient ||= User.first(:screen_name => configatron.twitter_account_name) rescue nil
       twitter_connect(@recipient)
       @recipient_stream ||= @twitter_client.home_timeline if @twitter_client
+    rescue Timeout::Error
+      STDERR.puts "Timeout with get_recipient_stream."
+      @recipient_stream = {}
     rescue
       STDERR.puts "Problem with get_recipient_stream. (#{$!})"
       @recipient_stream = {}
@@ -57,6 +60,9 @@ helpers do
       name = @recipient.screen_name rescue nil
       name ||= configatron.twitter_account_name
       @recipient_info ||= @twitter_client.user(name) if @twitter_client
+    rescue Timeout::Error
+      STDERR.puts "Timeout with get_recipient_info."
+      @recipient_info = {}
     rescue
       STDERR.puts "Problem with get_recipient_info. (#{$!})"
       @recipient_info = {}
@@ -69,9 +75,27 @@ helpers do
       @recipient ||= User.first(:screen_name => configatron.twitter_account_name) rescue nil
       twitter_connect(@recipient)
       @recipient_friends ||= @twitter_client.friends if @twitter_client
-    rescue
-      STDERR.puts "Problem with get_recipient_followers. (#{$!})"
+    rescue Timeout::Error
+      STDERR.puts "Timeout with get_recipient_friends."
       @recipient_friends = {}
+    rescue
+      STDERR.puts "Problem with get_recipient_friends. (#{$!})"
+      @recipient_friends = {}
+    end
+  end
+
+  def get_recipient_lists
+    return unless configatron.require_oauth_login && configatron.view_account_stream && @recipient_lists.nil?
+    begin
+      @recipient ||= User.first(:screen_name => configatron.twitter_account_name) rescue nil
+      twitter_connect(@recipient)
+      @recipient_lists ||= @twitter_client.lists(configatron.twitter_account_name) if @twitter_client
+    rescue Timeout::Error
+      STDERR.puts "Timeout with get_recipient_lists."
+      @recipient_lists = {}
+    rescue
+      STDERR.puts "Problem with get_recipient_lists. (#{$!})"
+      @recipient_lists = {}
     end
   end
 
@@ -90,13 +114,21 @@ helpers do
   end
 
   def twitter_auth(user={})
-    @twitter_auth = Twitter::OAuth.new(configatron.twitter_oauth_token, configatron.twitter_oauth_secret, :sign_in => true) rescue nil
-    @twitter_auth.authorize_from_access(user.oauth_token, user.oauth_secret) unless user.blank?
+    begin
+      @twitter_auth = Twitter::OAuth.new(configatron.twitter_oauth_token, configatron.twitter_oauth_secret, :sign_in => true) rescue nil
+      @twitter_auth.authorize_from_access(user.oauth_token, user.oauth_secret) unless user.blank?
+    rescue Timeout::Error
+    rescue
+    end
   end
   
   def twitter_connect(user={})
-    twitter_auth(user)
-    @twitter_client = Twitter::Base.new(@twitter_auth)
+    begin
+      twitter_auth(user)
+      @twitter_client = Twitter::Base.new(@twitter_auth)
+    rescue Timeout::Error
+    rescue
+    end
   end
 
   def twitter_fail(msg=false)
@@ -284,4 +316,10 @@ post '/' do
     end
 
   end
+end
+
+
+get '/about' do
+  @hide_stream = true
+  haml :about
 end
