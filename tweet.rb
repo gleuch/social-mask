@@ -182,6 +182,16 @@ helpers do
     tweet = tweet.gsub(/(#[A-Z0-9\_]+)/i, '<a href="http://twitter.com/search?q=\1" target="_blank" rel="nofollow">\1</a>')
     tweet
   end
+  def timestamp(status, link=true)
+    return '' if status.blank?
+    date_iso = Time.parse(status['created_at']).iso8601
+    date_regular = Time.parse(status['created_at']).strftime('%a, %b %d, %y %I:%M%P')
+    if link
+      "<a class='timeago' href='http://www.twitter.com/#{status['user']['screen_name'] || ''}/status/#{status['id']}' target='_blank' data='#{date_iso}'>#{date_regular}</a>"
+    else
+      "<span class='timeago' data='#{date_iso}'>#{date_regular}</span>"
+    end
+  end
   def flash; @_flash ||= {}; end
   def redirect(uri, *args)
     session[:_flash] = flash unless flash.empty?
