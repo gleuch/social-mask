@@ -1,5 +1,7 @@
-Pirata
-
+ ___          _      _   __  __         _   
+/ __| ___  __(_)__ _| | |  \/  |__ _ __| |__
+\__ \/ _ \/ _| / _` | | | |\/| / _` (_-< / /
+|___/\___/\__|_\__,_|_| |_|  |_\__,_/__/_\_\
 
 
 
@@ -19,4 +21,6 @@ Pirata
 === Changelog ===
 
 === About ===
+
+Based on earlier version of twitter-pirata by Greg Leuch (http://github.com/gleuch/twitter-pirata).
 
